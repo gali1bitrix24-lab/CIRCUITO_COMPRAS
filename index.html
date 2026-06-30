@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Cierre del circuito Compras · Facturas · Centros de coste</title>
+<style>
+  :root{
+    --bg:#F7F5F1;
+    --ink:#1F2A24;
+    --line:#C9C2B4;
+    --paper-edge:#0B3D2E;
+    --woo:#7C4DA8;
+    --doc:#1F6FB2;
+    --cont:#0B3D2E;
+    --accent:#C75B39;
+    --soft:#EFEAE0;
+    --display: "Iowan Old Style", "Georgia", serif;
+    --body: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+    --mono: "IBM Plex Mono", "Courier New", monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--body);
+    line-height:1.55;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:48px 28px 80px;}
+  header{
+    border-bottom:3px solid var(--ink);
+    padding-bottom:18px;
+    margin-bottom:36px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:24px;
+  }
+  header .eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 6px;
+  }
+  header h1{
+    font-family:var(--display);
+    font-size:30px;
+    margin:0;
+    font-weight:600;
+    letter-spacing:-0.01em;
+  }
+  header .meta{
+    font-family:var(--mono);
+    font-size:12px;
+    color:#6b6356;
+    text-align:right;
+    white-space:nowrap;
+  }
+  h2{
+    font-family:var(--display);
+    font-size:21px;
+    margin:0 0 14px;
+    font-weight:600;
+    border-left:4px solid var(--accent);
+    padding-left:12px;
+  }
+  section{margin-bottom:46px;}
+  p{margin:0 0 12px;font-size:15px;}
+  .lead{font-size:16.5px;color:#3a3530;}
+
+  /* Resumen ejecutivo grid */
+  .pillars{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+    margin:20px 0 28px;
+  }
+  .pillar{
+    background:#fff;
+    border:1px solid var(--line);
+    border-top:3px solid var(--accent);
+    padding:16px 16px 14px;
+  }
+  .pillar .n{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--accent);
+    letter-spacing:0.08em;
+  }
+  .pillar h3{
+    font-family:var(--display);
+    font-size:16px;
+    margin:6px 0 8px;
+  }
+  .pillar p{font-size:13.5px;margin:0;color:#4a443c;}
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:10px 0 8px;
+    font-size:14px;
+    background:#fff;
+  }
+  th,td{
+    border:1px solid var(--line);
+    padding:9px 12px;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{
+    background:var(--soft);
+    font-family:var(--mono);
+    font-size:11.5px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:#5c564a;
+  }
+  td.tag{font-family:var(--mono);font-size:12px;}
+  .tag-new{color:var(--accent);font-weight:600;}
+  .tag-keep{color:var(--cont);font-weight:600;}
+
+  .callout{
+    background:#fff;
+    border:1px solid var(--line);
+    border-left:4px solid var(--cont);
+    padding:14px 18px;
+    font-size:14px;
+    margin:18px 0;
+  }
+  .callout strong{color:var(--cont);}
+
+  /* Diagrama */
+  .diagram-frame{
+    background:#fff;
+    border:1px solid var(--line);
+    padding:18px;
+  }
+  .legend{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    font-family:var(--mono);
+    font-size:11.5px;
+    margin-top:10px;
+    color:#5c564a;
+  }
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .dot{width:10px;height:10px;display:inline-block;border-radius:2px;}
+
+  footer{
+    border-top:1px solid var(--line);
+    padding-top:14px;
+    font-family:var(--mono);
+    font-size:11px;
+    color:#8a8276;
+    display:flex;
+    justify-content:space-between;
+  }
+
+  @media print{
+    body{background:#fff;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <p class="eyebrow">Propuesta técnica · Compras internas</p>
+      <h1>Cerrar el circuito: Pedido → Factura → Centro de coste</h1>
+    </div>
+    <div class="meta">Grupo Galilea / Casal<br>30 jun 2026</div>
+  </header>
+
+  <section id="resumen">
+    <h2>Resumen ejecutivo</h2>
+    <p class="lead">Hoy el circuito está roto en tres puntos: WooCommerce no sabe qué pasó después del pedido, Docuware no sabe a qué pedido corresponde una factura, y la asignación a centro de coste se hace a mano cruzando aplicaciones. La propuesta no cambia ninguna plataforma — añade un <strong>identificador de pedido único</strong> que viaja desde Woo hasta Docuware, y una capa ligera de automatización (un conector / script de integración) que cierra el círculo sin tocar la infraestructura existente.</p>
+
+    <div class="pillars">
+      <div class="pillar">
+        <p class="n">01 — TRAZABILIDAD</p>
+        <h3>Un ID que lo une todo</h3>
+        <p>Cada pedido interno de Woo genera un nº de pedido (PO) único. Ese PO se incluye obligatoriamente en cada pedido a proveedor y se exige en el campo de "referencia" de la factura, vía OCR/metadato en Docuware.</p>
+      </div>
+      <div class="pillar">
+        <p class="n">02 — AUTOMATIZACIÓN DEL MATCH</p>
+        <h3>Conciliación automática</h3>
+        <p>Cuando llega una factura a Docuware, un proceso (RPA/integración) busca el PO en metadatos, recupera el pedido de Woo y propone el centro de coste y el importe esperado. Solo interviene una persona si hay desviación o excepción.</p>
+      </div>
+      <div class="pillar">
+        <p class="n">03 — APROBACIONES INTACTAS</p>
+        <h3>Mismo protocolo, sin papeleo</h3>
+        <p>Las reglas de quién autoriza según importe se mantienen igual. Lo único que cambia es que la autorización queda registrada como estado del pedido (no por email suelto), y ese estado viaja con el PO hasta contabilidad.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Mensaje clave para el CFO:</strong> no se propone migrar de WooCommerce, Docuware ni la contabilidad. Se propone un "pegamento" de integración (vía Zapier/Power Automate/script a medida con las APIs de Woo y Docuware) que hace de orquestador del PO entre los tres sistemas. Coste y riesgo bajos, sin curva de aprendizaje para nadie del equipo.
+    </div>
+  </section>
+
+  <section id="diagrama">
+    <h2>Diagrama del flujo (estado actual → propuesto)</h2>
+    <div class="diagram-frame">
+      <svg viewBox="0 0 1180 760" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:'Source Sans Pro',Arial,sans-serif;">
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L8,3 L0,6 Z" fill="#1F2A24"/>
+          </marker>
+          <marker id="arrow-new" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L8,3 L0,6 Z" fill="#C75B39"/>
+          </marker>
+        </defs>
+
+        <!-- Title row -->
+        <text x="20" y="28" font-size="13" font-weight="700" fill="#1F2A24" letter-spacing="0.04em">CIRCUITO PROPUESTO</text>
+        <text x="20" y="46" font-size="11" fill="#8a8276">Líneas negras = flujo actual · Líneas naranjas = nuevo enlace automático (vía PO único)</text>
+
+        <!-- ===== LANE 1: SOLICITUD ===== -->
+        <rect x="20" y="70" width="220" height="90" rx="4" fill="#fff" stroke="#7C4DA8" stroke-width="2"/>
+        <text x="130" y="95" font-size="13" font-weight="700" text-anchor="middle" fill="#7C4DA8">WooCommerce</text>
+        <text x="130" y="113" font-size="11.5" text-anchor="middle" fill="#3a3530">Empleado crea pedido interno</text>
+        <text x="130" y="129" font-size="11.5" text-anchor="middle" fill="#3a3530">(multi-proveedor, con/sin presupuesto)</text>
+        <text x="130" y="148" font-size="10.5" text-anchor="middle" fill="#C75B39" font-family="monospace">→ genera PO-ID único</text>
+
+        <!-- arrow down to autorizacion -->
+        <line x1="130" y1="160" x2="130" y2="200" stroke="#1F2A24" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+        <!-- ===== LANE 2: AUTORIZACION ===== -->
+        <rect x="20" y="200" width="220" height="100" rx="4" fill="#fff" stroke="#1F2A24" stroke-width="2"/>
+        <text x="130" y="222" font-size="13" font-weight="700" text-anchor="middle" fill="#1F2A24">Protocolo de autorización</text>
+        <text x="130" y="240" font-size="11" text-anchor="middle" fill="#3a3530">Importe → persona autorizadora</text>
+        <text x="130" y="256" font-size="11" text-anchor="middle" fill="#3a3530">(reglas por tramos de importe,</text>
+        <text x="130" y="271" font-size="11" text-anchor="middle" fill="#3a3530">sin cambios funcionales)</text>
+        <text x="130" y="290" font-size="10.5" text-anchor="middle" fill="#C75B39" font-family="monospace">→ estado queda en el PO</text>
+
+        <line x1="130" y1="300" x2="130" y2="340" stroke="#1F2A24" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+        <!-- ===== LANE 3: TU (RESPONSABLE COMPRAS) ===== -->
+        <rect x="20" y="340" width="220" height="90" rx="4" fill="#fff" stroke="#1F2A24" stroke-width="2"/>
+        <text x="130" y="362" font-size="13" font-weight="700" text-anchor="middle" fill="#1F2A24">Responsable de compras</text>
+        <text x="130" y="380" font-size="11" text-anchor="middle" fill="#3a3530">Recibe autorización</text>
+        <text x="130" y="396" font-size="11" text-anchor="middle" fill="#3a3530">Lanza pedidos por proveedor</text>
+        <text x="130" y="412" font-size="10.5" text-anchor="middle" fill="#C75B39" font-family="monospace">→ PO-ID en cada pedido externo</text>
+
+        <line x1="130" y1="430" x2="130" y2="470" stroke="#1F2A24" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+        <!-- ===== LANE 4: PROVEEDORES ===== -->
+        <rect x="20" y="470" width="220" height="100" rx="4" fill="#fff" stroke="#1F2A24" stroke-width="2"/>
+        <text x="130" y="492" font-size="13" font-weight="700" text-anchor="middle" fill="#1F2A24">Proveedores</text>
+        <text x="130" y="510" font-size="11" text-anchor="middle" fill="#3a3530">Amazon · DALBY · JUSTNET</text>
+        <text x="130" y="526" font-size="11" text-anchor="middle" fill="#3a3530">otros + suscripciones/membresías</text>
+        <text x="130" y="545" font-size="10.5" text-anchor="middle" fill="#C75B39" font-family="monospace">→ albarán/factura con PO-ID</text>
+        <text x="130" y="560" font-size="10" text-anchor="middle" fill="#8a8276">(referencia en pedido o asunto email)</text>
+
+        <!-- arrow right to docuware -->
+        <line x1="240" y1="520" x2="420" y2="520" stroke="#1F2A24" stroke-width="1.6" marker-end="url(#arrow)"/>
+        <text x="330" y="510" font-size="10" text-anchor="middle" fill="#8a8276">factura</text>
+
+        <!-- ===== DOCUWARE ===== -->
+        <rect x="420" y="470" width="230" height="100" rx="4" fill="#fff" stroke="#1F6FB2" stroke-width="2"/>
+        <text x="535" y="492" font-size="13" font-weight="700" text-anchor="middle" fill="#1F6FB2">Docuware</text>
+        <text x="535" y="510" font-size="11" text-anchor="middle" fill="#3a3530">Recepción y validación contable</text>
+        <text x="535" y="526" font-size="11" text-anchor="middle" fill="#3a3530">de facturas + posibles albaranes</text>
+        <text x="535" y="545" font-size="10.5" text-anchor="middle" fill="#C75B39" font-family="monospace">→ extrae PO-ID (OCR/metadato)</text>
+        <text x="535" y="560" font-size="10" text-anchor="middle" fill="#8a8276">campo indexación = PO-ID</text>
+
+        <!-- ===== NEW: ORQUESTADOR (centro) ===== -->
+        <rect x="420" y="280" width="230" height="120" rx="4" fill="#FBEFE9" stroke="#C75B39" stroke-width="2.4" stroke-dasharray="0"/>
+        <text x="535" y="304" font-size="13" font-weight="700" text-anchor="middle" fill="#C75B39">NUEVO · Orquestador PO</text>
+        <text x="535" y="322" font-size="11" text-anchor="middle" fill="#3a3530">Integración ligera (Power Automate /</text>
+        <text x="535" y="338" font-size="11" text-anchor="middle" fill="#3a3530">Zapier / script con APIs Woo+Docuware)</text>
+        <text x="535" y="358" font-size="11" text-anchor="middle" fill="#3a3530">Cruza PO-ID ↔ pedido ↔ factura</text>
+        <text x="535" y="374" font-size="11" text-anchor="middle" fill="#3a3530">Propone centro de coste + importe</text>
+        <text x="535" y="390" font-size="10" text-anchor="middle" fill="#8a8276">excepción → aviso humano</text>
+
+        <!-- arrows: docuware <-> orquestador -->
+        <line x1="535" y1="470" x2="535" y2="400" stroke="#C75B39" stroke-width="2" marker-end="url(#arrow-new)"/>
+        <!-- arrows: woo -> orquestador (PO origin) -->
+        <line x1="240" y1="115" x2="420" y2="115" stroke="#C75B39" stroke-width="2"/>
+        <line x1="420" y1="115" x2="420" y2="320" stroke="#C75B39" stroke-width="2" marker-end="url(#arrow-new)"/>
+        <text x="330" y="105" font-size="10" text-anchor="middle" fill="#C75B39">PO-ID + estado autorización</text>
+
+        <!-- arrow: orquestador -> contabilidad -->
+        <line x1="650" y1="340" x2="860" y2="340" stroke="#C75B39" stroke-width="2" marker-end="url(#arrow-new)"/>
+        <text x="755" y="330" font-size="10" text-anchor="middle" fill="#C75B39">propuesta asiento</text>
+
+        <!-- ===== CONTABILIDAD ===== -->
+        <rect x="860" y="280" width="240" height="160" rx="4" fill="#fff" stroke="#0B3D2E" stroke-width="2"/>
+        <text x="980" y="304" font-size="13" font-weight="700" text-anchor="middle" fill="#0B3D2E">Contabilidad</text>
+        <text x="980" y="324" font-size="11" text-anchor="middle" fill="#3a3530">Recibe match Pedido+Factura</text>
+        <text x="980" y="340" font-size="11" text-anchor="middle" fill="#3a3530">con centro de coste pre-asignado</text>
+        <text x="980" y="360" font-size="11" text-anchor="middle" fill="#3a3530">Solo valida / corrige excepciones</text>
+        <text x="980" y="380" font-size="11" text-anchor="middle" fill="#3a3530">Asiento contable final</text>
+        <text x="980" y="400" font-size="10.5" text-anchor="middle" fill="#C75B39" font-family="monospace">↺ feedback de centros de coste</text>
+        <text x="980" y="416" font-size="10" text-anchor="middle" fill="#8a8276">(tabla de mapeo proveedor→CC en Woo)</text>
+
+        <!-- feedback loop arrow from contabilidad back to orquestador -->
+        <path d="M 980 280 C 980 240, 650 240, 650 290" fill="none" stroke="#0B3D2E" stroke-width="1.6" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+        <text x="800" y="235" font-size="10" text-anchor="middle" fill="#0B3D2E">mapeo CC actualizado</text>
+
+        <!-- Docuware -> contabilidad direct (validacion) -->
+        <line x1="650" y1="540" x2="980" y2="440" stroke="#1F2A24" stroke-width="1.4" stroke-dasharray="3,3" marker-end="url(#arrow)"/>
+        <text x="800" y="500" font-size="10" text-anchor="middle" fill="#8a8276">validación contable factura</text>
+
+        <!-- ===== Bottom strip: cierre de ciclo ===== -->
+        <rect x="20" y="620" width="1080" height="110" rx="4" fill="#EFEAE0" stroke="#C9C2B4" stroke-width="1"/>
+        <text x="40" y="645" font-size="12.5" font-weight="700" fill="#1F2A24">Cierre del círculo</text>
+        <text x="40" y="666" font-size="11.5" fill="#3a3530">1. El PO-ID nace en Woo y viaja sin fricción hasta el asiento contable.</text>
+        <text x="40" y="685" font-size="11.5" fill="#3a3530">2. El orquestador hace el cruce automático Pedido ↔ Albarán ↔ Factura ↔ Centro de coste.</text>
+        <text x="40" y="704" font-size="11.5" fill="#3a3530">3. La única intervención humana es la que ya exige el protocolo: autorizar por importe, y resolver excepciones (desvíos de importe, falta de PO-ID, etc.).</text>
+        <text x="40" y="723" font-size="11" fill="#8a8276">Resultado: cero doble tecleo entre Woo, Docuware y contabilidad.</text>
+      </svg>
+
+      <div class="legend">
+        <span><span class="dot" style="background:#7C4DA8;"></span>WooCommerce (tienda interna)</span>
+        <span><span class="dot" style="background:#1F6FB2;"></span>Docuware (facturas)</span>
+        <span><span class="dot" style="background:#0B3D2E;"></span>Contabilidad</span>
+        <span><span class="dot" style="background:#C75B39;"></span>Nuevo: orquestador PO-ID</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="cambios">
+    <h2>Qué se mantiene vs. qué se añade</h2>
+    <table>
+      <thead>
+        <tr><th>Elemento</th><th>Estado</th><th>Detalle</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>WooCommerce</td>
+          <td class="tag tag-keep">Se mantiene</td>
+          <td>Sigue siendo la tienda interna. Se añade un nº de pedido único visible y un campo de "estado" (pendiente / autorizado / pedido a proveedor / recibido / facturado).</td>
+        </tr>
+        <tr>
+          <td>Protocolo de autorización por importe</td>
+          <td class="tag tag-keep">Se mantiene</td>
+          <td>Mismas reglas y mismas personas. Solo se digitaliza el "quién aprobó" como dato del pedido en lugar de email/verbal.</td>
+        </tr>
+        <tr>
+          <td>Docuware</td>
+          <td class="tag tag-keep">Se mantiene</td>
+          <td>Sigue siendo el punto de entrada de facturas. Se añade un campo de indexación obligatorio = PO-ID (vía OCR o entrada manual del proveedor en el asunto/referencia).</td>
+        </tr>
+        <tr>
+          <td>Contabilidad / centros de coste</td>
+          <td class="tag tag-keep">Se mantiene</td>
+          <td>Sigue haciendo el asiento final. Recibe la propuesta de centro de coste ya cruzada, solo valida.</td>
+        </tr>
+        <tr>
+          <td>Orquestador de integración</td>
+          <td class="tag tag-new">Nuevo (ligero)</td>
+          <td>Capa de automatización (Power Automate, Zapier, o script propio sobre las APIs de Woo y Docuware) que genera el PO-ID, lo propaga y hace el match automático.</td>
+        </tr>
+        <tr>
+          <td>Tabla de mapeo proveedor → centro de coste</td>
+          <td class="tag tag-new">Nuevo (ligero)</td>
+          <td>Tabla de referencia (puede vivir en Woo o en una hoja conectada) para que el orquestador proponga el centro de coste sin intervención manual en el caso estándar.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="siguientes-pasos">
+    <h2>Próximos pasos sugeridos</h2>
+    <div class="callout">
+      <strong>Para validar con el CFO hoy:</strong> (1) confirmar que el PO-ID será el campo común entre los tres sistemas; (2) decidir la herramienta de orquestación (Power Automate si ya hay licencia Microsoft, o Zapier/script si no); (3) acordar qué se considera "excepción" que requiere intervención humana (desvío de importe, factura sin PO-ID, proveedor nuevo no mapeado).
+    </div>
+  </section>
+
+  <footer>
+    <span>Documento de apoyo para reunión · No sustituye especificación técnica detallada</span>
+    <span>v1 · 30/06/2026</span>
+  </footer>
+
+</div>
+</body>
+</html>
